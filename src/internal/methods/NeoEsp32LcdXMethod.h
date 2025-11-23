@@ -539,10 +539,14 @@ public:
     void Initialize(uint8_t pin, uint16_t nsBitSendTime, bool invert)
     {
         s_context.Construct(nsBitSendTime);
-        
+
         uint8_t muxIdx = LCD_DATA_OUT0_IDX + _muxId;
         esp_rom_gpio_connect_out_signal(pin, muxIdx, invert, false);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 5, 0)
+        gpio_iomux_out(pin, PIN_FUNC_GPIO, false);
+#else
         gpio_hal_iomux_func_sel(GPIO_PIN_MUX_REG[pin], PIN_FUNC_GPIO);
+#endif
         gpio_set_drive_capability((gpio_num_t)pin, (gpio_drive_cap_t)3);
     }
 
